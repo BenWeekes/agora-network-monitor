@@ -18,9 +18,9 @@ var AgoraRTCNetEx = (function () {
     // if >1 remote then low uplink is due to
     // my uplink, downlink issues could still be related to pub uplink
     */
+    const NetworkStatusExcellent = 'Excellent';
     const NetworkStatusGood = 'Good';
-    const NetworkStatusOK = 'OK';
-    const NetworkStatusBad = 'Bad';
+    const NetworkStatusAverage = 'Average';
     const NetworkStatusPoor = 'Poor';
     const NetworkStatusCritical = 'Critical';
 
@@ -46,8 +46,8 @@ var AgoraRTCNetEx = (function () {
             currentPacketLossRate: 0,
             outboundEstimatedBitrate: 0,
             targetBitrate:0,
-            downlink: NetworkStatusGood,
-            uplink: NetworkStatusGood,
+            downlink: NetworkStatusExcellent,
+            uplink: NetworkStatusExcellent,
         };
 
         for (var i = 0; i < _rtc_clients.length; i++) {
@@ -99,8 +99,8 @@ var AgoraRTCNetEx = (function () {
                                 lossRate: 0,
                                 packetChange: 0,
                                 lastPacketsLost: 0,
-                                downlink:NetworkStatusGood,
-                                uplink:NetworkStatusGood,
+                                downlink:NetworkStatusExcellent,
+                                uplink:NetworkStatusExcellent,
                             };
                         }
                         /*
@@ -163,12 +163,12 @@ var AgoraRTCNetEx = (function () {
                         // my uplink bad
                         if (clientStats.RecvBitrate < 105000) {
                             clientStatsMapTemp.downlink = NetworkStatusCritical
-                        } else if (clientStats.RecvBitrate < 0.25 * _targetBitrate * 1000) {
+                        } else if (clientStats.RecvBitrate < 0.3 * _targetBitrate * 1000) {
                             clientStatsMapTemp.downlink = NetworkStatusPoor
                         } else if (clientStats.RecvBitrate < 0.5 * _targetBitrate * 1000) {
-                            clientStatsMapTemp.downlink = NetworkStatusBad
-                        } else if (clientStats.RecvBitrate < 0.7 * _targetBitrate * 1000) {
-                            clientStatsMapTemp.downlink = NetworkStatusOK
+                            clientStatsMapTemp.downlink = NetworkStatusAverage
+                        } else if (clientStats.RecvBitrate < 0.8 * _targetBitrate * 1000) {
+                            clientStatsMapTemp.downlink = NetworkStatusGood
                         }
                     }
                 }
@@ -180,12 +180,12 @@ var AgoraRTCNetEx = (function () {
                         // my uplink bad
                         if (clientStats.OutgoingAvailableBandwidth < 105) {
                             clientStatsMapTemp.uplink = NetworkStatusCritical
-                        } else if (clientStats.OutgoingAvailableBandwidth < 0.25 * _targetBitrate) {
+                        } else if (clientStats.OutgoingAvailableBandwidth < 0.3 * _targetBitrate) {
                             clientStatsMapTemp.uplink = NetworkStatusPoor
                         } else if (clientStats.OutgoingAvailableBandwidth < 0.5 * _targetBitrate) {
-                            clientStatsMapTemp.uplink = NetworkStatusBad
-                        } else if (clientStats.OutgoingAvailableBandwidth < 0.7 * _targetBitrate) {
-                            clientStatsMapTemp.uplink = NetworkStatusOK
+                            clientStatsMapTemp.uplink = NetworkStatusAverage
+                        } else if (clientStats.OutgoingAvailableBandwidth < 0.8 * _targetBitrate) {
+                            clientStatsMapTemp.uplink = NetworkStatusGood
                         }
                     }
                 }
@@ -234,8 +234,8 @@ var AgoraRTCNetEx = (function () {
             return _userStatsMap;
         },
         NetworkStatusGood: NetworkStatusGood,
-        NetworkStatusOK: NetworkStatusOK,
-        NetworkStatusBad: NetworkStatusBad,
+        NetworkStatusExcellent: NetworkStatusExcellent,
+        NetworkStatusAverage: NetworkStatusAverage,
         NetworkStatusPoor: NetworkStatusPoor,
         NetworkStatusCritical: NetworkStatusCritical,
     };

@@ -1,9 +1,3 @@
-
-//client.sendStreamMessage(payload: UInt8Array);
-//To receive message:
-//client.on("stream-message", (uid: UID, payload: UInt8Array) => {})
-
-
 // create Agora client
 var client = AgoraRTC.createClient({ mode: "rtc", codec: "vp9" });
 AgoraRTC.enableLogUpload();
@@ -20,6 +14,7 @@ var options = {
   token: null
 };
 
+let dualStream=false;
 let statsInterval;
 
 // the demo can auto join channel with params in url
@@ -29,6 +24,7 @@ $(() => {
   options.channel = urlParams.get("channel");
   options.token = urlParams.get("token");
   options.uid = urlParams.get("uid");
+  dualStream=('true'==urlParams.get("dualStream"));
   if (options.appid && options.channel) {
     $("#uid").val(options.uid);
     $("#appid").val(options.appid);
@@ -64,9 +60,11 @@ $("#leave").click(function (e) {
   leave();
 })
 
-
 async function join() {
   // add event listener to play remote tracks when remote user publishs.
+  if (dualStream){
+    client.enableDualStream();
+  }
   client.on("user-published", handleUserPublished);
   client.on("user-unpublished", handleUserUnpublished);
 
@@ -85,11 +83,8 @@ async function join() {
 
   // publish local tracks to channel
   AgoraRTCNetEx.monitorNetwork(client,2000);
-  //AgoraRTCNetEx.monitorUplink(client, 500, 30, 1920, 1080);
-
   await client.publish(Object.values(localTracks));
   console.log("publish success");
-
   initStats();
 }
 
@@ -102,9 +97,7 @@ async function leave() {
       localTracks[trackName] = undefined;
     }
   }
-
   destructStats();
-
   // remove remote users and player views
   remoteUsers = {};
   $("#remote-playerlist").html("");
@@ -125,6 +118,11 @@ async function subscribe(user, mediaType) {
   await client.subscribe(user, mediaType);
   console.log("subscribe success");
   if (mediaType === 'video') {
+    if (dualStream) {
+      client.setStreamFallbackOption(uid,2);
+    }
+    
+
     const player = $(`
       <div id="player-wrapper-${uid}">
         <p class="player-name">remoteUser(${uid})</p>
@@ -153,7 +151,6 @@ function handleUserUnpublished(user, mediaType) {
     const id = user.uid;
     delete remoteUsers[id];
     $(`#player-wrapper-${id}`).remove();
-
   }
 }
 
