@@ -76,7 +76,7 @@ async function join() {
     localTracks.audioTrack = await AgoraRTC.createMicrophoneAudioTrack();
   }
   if (!localTracks.videoTrack) {
-    localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: "1080p_2" });
+    localTracks.videoTrack = await AgoraRTC.createCameraVideoTrack({ encoderConfig: "720p_3" });
   }
   // play local video track
   localTracks.videoTrack.play("local-player");
@@ -190,11 +190,15 @@ function flushStats() {
   `)
 
   const clientNetworkStatsList = [
-    { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
-    { description: "bitrate inbound", value: clientNetworkStats.recvBitrate, unit: "bps" },
     { description: "bitrate outbound", value: clientNetworkStats.sendBitrate, unit: "bps" },
     { description: "nackRateOutbound", value: clientNetworkStats.nackRateOutbound, unit: "%" },
     { description: "currentPacketLossRateOutbound", value: clientNetworkStats.currentPacketLossRate, unit: "%" },
+    { description: "qualityLimitationReason", value: clientNetworkStats.qualityLimitationReason, unit: "" },
+    { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "bps" },
+    { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "bps" },
+    { description: "", value: "", unit: "" },
+    { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
+    { description: "bitrate inbound", value: clientNetworkStats.recvBitrate, unit: "bps" },
     { description: "nackRateInboundMin", value: clientNetworkStats.nackRateInboundMin, unit: "%" },
     { description: "nackRateInboundAvg", value: clientNetworkStats.nackRateInboundAvg, unit: "%" },
     { description: "lossRateInboundMin", value: clientNetworkStats.lossRateInboundMin, unit: "%" },
@@ -209,9 +213,6 @@ function flushStats() {
     { description: "lossCountAgoraAudioInboundAvg", value: clientNetworkStats.lossCountAgoraAudioInboundAvg, unit: "" },
 
 
-    { description: "qualityLimitationReason", value: clientNetworkStats.qualityLimitationReason, unit: "" },
-    { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "bps" },
-    { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "bps" },
 
 
     
