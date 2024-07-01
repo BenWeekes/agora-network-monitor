@@ -33,12 +33,11 @@ var AgoraRTCNetEx = (function () {
 
 
     Include audio PL
-
     // some kind of history to be used to decide where problem is while target rate is low 
     // check cam off, refresh remote 
     // broadcast: targetbitrate and important loss stats 
-    // if >1 remote then low uplink is due to my uplink, downlink issues could still be related to pub uplink
-
+    // if >1 remote then low uplink is due to
+    // my uplink, downlink issues could still be related to pub uplink
     */
     const NetworkStatusGood = 0;
     const NetworkStatusFair = 1;
@@ -54,6 +53,9 @@ var AgoraRTCNetEx = (function () {
     let lastNackOutbound = 0;
     let lastStatsRead = 0;
     let lastPacketsSent = 0;
+    let nackRateOutboundMax = 0;
+
+    let lossCountAgoraAudioVideoInboundAvgMax=0;
 
     var _userStatsMap = {};
     var _clientStatsMap = {};
@@ -67,6 +69,8 @@ var AgoraRTCNetEx = (function () {
             recvBitrate: 0,
             sendBitrate: 0,
             nackRateOutbound: 0,
+            nackRateOutboundMax: 0,
+            lossCountAgoraAudioVideoInboundAvgMax:0,
             nackRateInboundAvg: 0,
             nackRateInboundMin: 0,
             lossRateInboundAvg: 0,
@@ -86,6 +90,8 @@ var AgoraRTCNetEx = (function () {
             outboundEstimatedBitrate: 0,
             statsScheduleTime: 0,
             qualityLimitationReason: 'none',
+            downlink: 'good',
+            uplink: 'good',
         };
         clientStatsMapTemp.statsScheduleTime = _monitorStart - _monitorEnd;
 
@@ -118,6 +124,9 @@ var AgoraRTCNetEx = (function () {
                             var timeDiff = now - lastStatsRead;
                             if (packetChange > 0 && nackChange > 0) {
                                 clientStatsMapTemp.nackRateOutbound = Math.floor((nackChange / packetChange) * (timeDiff / 10));
+                            }
+                            if (clientStatsMapTemp.nackRateOutbound>nackRateOutboundMax) {
+                                nackRateOutboundMax=clientStatsMapTemp.nackRateOutbound;
                             }
                             lastNackOutbound = nack;
                             lastPacketsSent = packetsSent;
@@ -198,13 +207,6 @@ var AgoraRTCNetEx = (function () {
                             _userStatsMap[uid].renderFrameRate = 0;
                         }
 
-                        /*
-                        if (remoteTracksStats.video.receivePacketsLost) {
-                            _userStatsMap[uid].lossRate = Number(remoteTracksStats.video.receivePacketsLost);
-                        } else {
-                            _userStatsMap[uid].lossRate = 0;
-                        }*/
-
                         _userStatsMap[uid].receiveResolutionWidth = Number(remoteTracksStats.video.receiveResolutionWidth).toFixed(0);
                         _userStatsMap[uid].receiveResolutionHeight = Number(remoteTracksStats.video.receiveResolutionHeight).toFixed(0);
                         _userStatsMap[uid].receiveBitrate = Number(remoteTracksStats.video.receiveBitrate / 1000).toFixed(0);
@@ -260,8 +262,50 @@ var AgoraRTCNetEx = (function () {
                     clientStatsMapTemp.lossCountAgoraAudioInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg / clientStatsMapTemp.remoteSubCount;    
                 }
                 
+                if (clientStatsMapTemp.lossCountAgoraVideoInboundAvg+clientStatsMapTemp.lossCountAgoraAudioInboundAvg>lossCountAgoraAudioVideoInboundAvgMax) {
+                    lossCountAgoraAudioVideoInboundAvgMax=clientStatsMapTemp.lossCountAgoraVideoInboundAvg+clientStatsMapTemp.lossCountAgoraAudioInboundAvg;
+                }
+                              
                 clientStatsMapTemp.recvBitrate = clientStats.RecvBitrate;
                 clientStatsMapTemp.sendBitrate = clientStats.SendBitrate;
+                if (clientStats.RecvBitrate>0.8*clientStatsMapTemp.targetBitrate) {
+                    lossCountAgoraAudioVideoInboundAvgMax=0;
+                } else {
+                    if (lossCountAgoraAudioVideoInboundAvgMax>100) {
+                        // my downlink bad
+                        clientStatsMapTemp.downlink="bad";
+                        // my uplink bad
+                        if (clientStats.recvBitrate<105) {
+                            clientStatsMapTemp.downlink="critical";
+                        } else if (clientStats.recvBitrate<0.25*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.downlink="poor";
+                        }  else if (clientStats.recvBitrate<0.5*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.downlink="bad";
+                        }  else if (clientStats.recvBitrate<0.7*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.downlink="ok";
+                        }
+                    }
+                }
+                clientStatsMapTemp.lossCountAgoraAudioVideoInboundAvgMax=lossCountAgoraAudioVideoInboundAvgMax;
+              
+                if (clientStats.OutgoingAvailableBandwidth>0.8*clientStatsMapTemp.targetBitrate) {
+                    nackRateOutboundMax=0;
+                } else {
+                    if (nackRateOutboundMax >10) {
+                        // my uplink bad
+                        if (clientStats.OutgoingAvailableBandwidth<105) {
+                            clientStatsMapTemp.uplink="critical";
+                        } else if (clientStats.OutgoingAvailableBandwidth<0.25*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.uplink="poor";
+                        }  else if (clientStats.OutgoingAvailableBandwidth<0.5*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.uplink="bad";
+                        }  else if (clientStats.OutgoingAvailableBandwidth<0.7*clientStatsMapTemp.targetBitrate) {
+                            clientStatsMapTemp.uplink="ok";
+                        }
+                    }
+                }
+                clientStatsMapTemp.nackRateOutboundMax=nackRateOutboundMax;
+
             }
         }
         _monitorEnd = Date.now();
@@ -273,28 +317,21 @@ var AgoraRTCNetEx = (function () {
 
         let NetworkStatus = NetworkStatusGood;
         // broadcast to others
-        sendMessage(client, NetworkStatus, _clientStatsMap.RecvBitrate);
+        sendMessage(client, "uplink:"+clientStatsMapTemp.uplink+", downlink:"+clientStatsMapTemp.downlink);
     }
 
 
-    function sendMessage(client, status, bitrate) {
-        var msg = 'bem';
-        client.sendStreamMessage({ text: msg, payload: msg }).then(() => {
+    function sendMessage(client, message) {
+        client.sendStreamMessage({ payload: message }).then(() => {
         }).catch(error => {
             console.error('AgoraRTM  send failure');
         });
     }
 
     function receiveMessage(senderId, data) {
-        // console.log('receiveMessage',senderId, data);
-
-
         const textDecoder = new TextDecoder();
-
-        // Decode the Uint8Array to a string
         const decodedText = textDecoder.decode(data);
         console.log('receiveMessage', senderId, decodedText);
-
     }
 
     return { // public interfaces
