@@ -1,9 +1,9 @@
 
 ## AgoraRTCNetEx.js
-This javascript module provides an 'Out of band' network monitor to work along side AgoraRTC 4.x SDK.
-It is able to report the true uplink/downlink of each host in the channel.       
-It does not revert to 'Good' if packet losses reduce while the bitrate is lowered in full path feedback mode.       
-It does not confuse my downlink with your uplink.        
+This javascript module provides an 'Out of band' network monitor to work along side AgoraRTC 4.x SDK.    
+It is able to report the true uplink/downlink status of each host in the channel.       
+It does not revert to 'Good' if the packet losses reduce while the bitrate is lowered in either Full Path Feedback or Dual Stream failover modes.      
+It does not confuse my downlink with your uplink quality or vice versa.         
 
 
 #### Include the javascript:
