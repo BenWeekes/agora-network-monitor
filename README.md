@@ -1,7 +1,10 @@
 
 ## AgoraRTCNetEx.js
-This javascript module provides an 'Out of band' bandwidth adaptation algorithm to work alongside the AgoraRTC 4.x SDK.
-It can produce better results than the standard webrtc alogirthm which can be oversensitive for some real-time engagement applications. 
+This javascript module provides an 'Out of band' network monitor to work along side AgoraRTC 4.x SDK.
+It is able to report the true uplink/downlink of each host in the channel.       
+It does not revert to 'Good' if packet losses reduce while the bitrate is lowered in full path feedback mode.       
+It does not confuse my downlink with your uplink.        
+
 
 #### Include the javascript:
 
@@ -16,18 +19,15 @@ Pass in the min and max bit rates that you wish the high stream encoder to move 
 
 <pre>
 
-AgoraRTCNetEx.optimizeNetworkControl(client, rtm_appid, rtm_token, br_min, br_max);
+AgoraRTCNetEx.monitorNetwork(client, targetBitrate);
 
 client         The AgoraRTC client object returned from createClient method.     
-rtm_appid      The RTM AppId to connect into an RTM channel.     
-rtm_token      The RTM token to connect into an RTM channel (if tokens are enabled for this appid otherwise pass null)       
-br_min         The lowest bitrate a client will encode at. Below this subscribers could move to a low stream alternative.       
-br_max         The highest bitrate a client will encode at. Below this subscribers could move to a low stream alternative.       
+targetBitrate  The target/max bitrate a client will publish video at. 
 </pre>
 
 
 #### Web Demo
-https://sa-utils.agora.io/agora-netex/index.html
+https://sa-utils.agora.io/agora-network-monitor/index.html
 
 #### Demo Videos
 
@@ -42,4 +42,4 @@ https://drive.google.com/file/d/10TJpSpex5E_baM26rqxnb1d9alIyA7lS/view?usp=shari
 #### Further enhancements   
 Test further when more than 2 hosts publishing in channel.      
 Switch subscriber to low stream if inbound bitrate below br_min.    
-# agora-network-monitor
+
