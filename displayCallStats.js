@@ -175,101 +175,40 @@ function flushStats() {
   // get the client stats message
   const clientStats = client.getRTCStats();
   const clientNetworkStats = AgoraRTCNetEx.getNetworkStats();
-  const clientStatsList = [
-    { description: "Number of users in channel", value: clientStats.UserCount, unit: "" },
-    { description: "Duration in channel", value: clientStats.Duration, unit: "s" },
-    { description: "Bit rate receiving", value: clientStats.RecvBitrate, unit: "bps" },
-    { description: "Bit rate being sent", value: clientStats.SendBitrate, unit: "bps" },
-    { description: "Total bytes received", value: clientStats.RecvBytes, unit: "bytes" },
-    { description: "Total bytes sent", value: clientStats.SendBytes, unit: "bytes" },
-    { description: "Outgoing available bandwidth", value: clientStats.OutgoingAvailableBandwidth.toFixed(3), unit: "kbps" },
-    { description: "RTT from SDK to SD-RTN access node", value: clientStats.RTT, unit: "ms" },
-  ]
-  $("#client-stats").html(`
-    ${clientStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
-  `)
-
+  
   const clientNetworkStatsList = [
-    { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "bps" },
-    { description: "bitrate outbound", value: clientNetworkStats.sendBitrate, unit: "bps" },
-    //{ description: "nackRateOutbound", value: clientNetworkStats.nackRateOutbound, unit: "%" },
-    //{ description: "currentPacketLossRateOutbound", value: clientNetworkStats.currentPacketLossRate, unit: "%" },
-    //{ description: "qualityLimitationReason", value: clientNetworkStats.qualityLimitationReason, unit: "" },
-    { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "bps" },
+    { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "kbps" },
+    { description: "bitrate outbound", value: Math.floor(clientStats.SendBitrate/1000), unit: "kbps" },
+    { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "kbps" },
     { description: "nackRateOutboundMax", value: clientNetworkStats.nackRateOutboundMax, unit: "%" },
     { description: "uplink", value: clientNetworkStats.uplink, unit: "" },
 
     { description: "", value: "", unit: "" },
     { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
-    { description: "bitrate inbound", value: clientNetworkStats.recvBitrate, unit: "bps" },
+    { description: "bitrate inbound", value: Math.floor(clientStats.RecvBitrate/1000), unit: "kbps" },
     { description: "lossCountAgoraAudioVideoInboundAvgMax", value: clientNetworkStats.lossCountAgoraAudioVideoInboundAvgMax, unit: "" },
     { description: "downlink", value: clientNetworkStats.downlink, unit: "" },
-    //{ description: "nackRateInboundMin", value: clientNetworkStats.nackRateInboundMin, unit: "%" },
-    //{ description: "nackRateInboundAvg", value: clientNetworkStats.nackRateInboundAvg, unit: "%" },
-    //{ description: "lossRateInboundMin", value: clientNetworkStats.lossRateInboundMin, unit: "%" },
-    //{ description: "lossRateInboundAvg", value: clientNetworkStats.lossRateInboundAvg, unit: "%" },
-    //{ description: "lossRateAgoraVideoInboundMin", value: clientNetworkStats.lossRateAgoraVideoInboundMin, unit: "" },
-    //{ description: "lossRateAgoraVideoInboundAvg", value: clientNetworkStats.lossRateAgoraVideoInboundAvg, unit: "" },
-    //{ description: "lossRateAgoraAudioInboundMin", value: clientNetworkStats.lossRateAgoraAudioInboundMin, unit: "" },
-    //{ description: "lossRateAgoraAudioInboundAvg", value: clientNetworkStats.lossRateAgoraAudioInboundAvg, unit: "" },
-    //{ description: "lossCountAgoraVideoInboundMin", value: clientNetworkStats.lossCountAgoraVideoInboundMin, unit: "" },
-    //{ description: "lossCountAgoraVideoInboundAvg", value: clientNetworkStats.lossCountAgoraVideoInboundAvg, unit: "" },
-    //{ description: "lossCountAgoraAudioInboundMin", value: clientNetworkStats.lossCountAgoraAudioInboundMin, unit: "" },
-    //{ description: "lossCountAgoraAudioInboundAvg", value: clientNetworkStats.lossCountAgoraAudioInboundAvg, unit: "" },
-
-
-
-
-    
-      
   ]
-  //${clientStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   $("#client-stats").html(`
     ${clientNetworkStatsList.map(stat => `<p class="stats-row"><b>${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   `)
   // get the local track stats message
-  const localStats = { video: client.getLocalVideoStats(), audio: client.getLocalAudioStats() };
+  //const localStats = { video: client.getLocalVideoStats(), audio: client.getLocalAudioStats() };
   const localStatsList = [
-    { description: "Send audio bit rate", value: localStats.audio.sendBitrate, unit: "bps" },
-    { description: "Total audio bytes sent", value: localStats.audio.sendBytes, unit: "bytes" },
-    { description: "Total audio packets sent", value: localStats.audio.sendPackets, unit: "" },
-    { description: "Total audio packets loss", value: localStats.audio.sendPacketsLost, unit: "" },
-    { description: "Video capture resolution height", value: localStats.video.captureResolutionHeight, unit: "" },
-    { description: "Video capture resolution width", value: localStats.video.captureResolutionWidth, unit: "" },
-    { description: "Video send resolution height", value: localStats.video.sendResolutionHeight, unit: "" },
-    { description: "Video send resolution width", value: localStats.video.sendResolutionWidth, unit: "" },
-    { description: "video encode delay", value: Number(localStats.video.encodeDelay).toFixed(2), unit: "ms" },
-    { description: "Send video bit rate", value: localStats.video.sendBitrate, unit: "bps" },
-    { description: "Total video bytes sent", value: localStats.video.sendBytes, unit: "bytes" },
-    { description: "Total video packets sent", value: localStats.video.sendPackets, unit: "" },
-    { description: "Total video packets loss", value: localStats.video.sendPacketsLost, unit: "" },
-    { description: "Video duration", value: localStats.video.totalDuration, unit: "s" },
-    { description: "Total video freeze time", value: localStats.video.totalFreezeTime, unit: "s" },
   ];
   $("#local-stats").html(`
     ${localStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   `);
 
+  let _userStatsMap=AgoraRTCNetEx.getRemoteNetworkStats();
+
   Object.keys(remoteUsers).forEach(uid => {
     // get the remote track stats message
-    const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
+    //const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
     const remoteTracksStatsList = [
-      { description: "Receiving video bit rate", value: remoteTracksStats.video.receiveBitrate, unit: "bps" },
-      { description: "Delay of audio from sending to receiving", value: Number(remoteTracksStats.audio.receiveDelay).toFixed(2), unit: "ms" },
-      { description: "Delay of video from sending to receiving", value: Number(remoteTracksStats.video.receiveDelay).toFixed(2), unit: "ms" },
-      { description: "Total audio bytes received", value: remoteTracksStats.audio.receiveBytes, unit: "bytes" },
-      { description: "Total audio packets received", value: remoteTracksStats.audio.receivePackets, unit: "" },
-      { description: "Total audio packets loss", value: remoteTracksStats.audio.receivePacketsLost, unit: "" },
-      { description: "Total audio packets loss rate", value: Number(remoteTracksStats.audio.packetLossRate).toFixed(3), unit: "%" },
-      { description: "Video received resolution height", value: remoteTracksStats.video.receiveResolutionHeight, unit: "" },
-      { description: "Video received resolution width", value: remoteTracksStats.video.receiveResolutionWidth, unit: "" },
-      { description: "Total video bytes received", value: remoteTracksStats.video.receiveBytes, unit: "bytes" },
-      { description: "Total video packets received", value: remoteTracksStats.video.receivePackets, unit: "" },
-      { description: "Total video packets loss", value: remoteTracksStats.video.receivePacketsLost, unit: "" },
-      { description: "Total video packets loss rate", value: Number(remoteTracksStats.video.receivePacketsLost).toFixed(3), unit: "%" },
-      { description: "Video duration", value: remoteTracksStats.video.totalDuration, unit: "s" },
-      { description: "Total video freeze time", value: remoteTracksStats.video.totalFreezeTime, unit: "s" },
-      { description: "video freeze rate", value: Number(remoteTracksStats.video.freezeRate).toFixed(3), unit: "%" },
+
+      { description: "Uplink", value: _userStatsMap[uid].uplink, unit: "" },
+      { description: "Downlink", value: _userStatsMap[uid].downlink, unit: "" },
     ];
     $(`#player-wrapper-${uid} .track-stats`).html(`
       ${remoteTracksStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
