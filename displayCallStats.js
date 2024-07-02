@@ -64,7 +64,7 @@ function networkUpdate(stats) {
   console.log('networkUpdate',stats);
 }
 
-_netlocal;
+let _netlocal;
 
 function networkUpdateA(stats) {
   _netlocal=stats;
