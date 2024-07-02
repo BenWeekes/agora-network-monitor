@@ -60,6 +60,18 @@ $("#leave").click(function (e) {
   leave();
 })
 
+function networkUpdate(stats) {
+  console.log('networkUpdate',stats);
+}
+
+_netlocal;
+
+function networkUpdateA(stats) {
+  _netlocal=stats;
+  console.log('networkUpdateA',stats);
+}
+
+
 async function join() {
   // add event listener to play remote tracks when remote user publishs.
   if (dualStream){
@@ -67,6 +79,10 @@ async function join() {
   }
   client.on("user-published", handleUserPublished);
   client.on("user-unpublished", handleUserUnpublished);
+
+  AgoraRTCNetExEvents.on("NetworkUpdate",networkUpdate);
+  client.on("network-quality",networkUpdateA);
+  client.getRemoteNetworkQuality();
 
   // join the channel
   options.uid = await client.join(options.appid, options.channel, options.token || null, options.uid || null)
@@ -122,7 +138,6 @@ async function subscribe(user, mediaType) {
       client.setStreamFallbackOption(uid,2);
     }
     
-
     const player = $(`
       <div id="player-wrapper-${uid}">
         <p class="player-name">remoteUser(${uid})</p>
@@ -166,7 +181,33 @@ function destructStats() {
   $("#transport-stats").html("");
   $("#local-stats").html("");
 }
+function displayAgoraQuality(quality) {
 
+  switch (quality) {
+    case 1:
+      return 'Excellent';
+      break;
+    case 2:
+      return 'Good';
+      break;
+    case 3:
+      return 'Average';
+      break;
+    case 4:
+      return 'Poor';
+      break;
+    case 5:
+      return 'Critical';
+      break;
+    case 6:
+      return 'Critical';
+      break;
+    default:
+      return 'Unknown';
+  }
+
+
+}
 // flush stats views
 function flushStats() {
   // get the client stats message
@@ -174,38 +215,44 @@ function flushStats() {
   const clientNetworkStats = AgoraRTCNetEx.getNetworkStats();
   
   const clientNetworkStatsList = [
+    { description: "up stats", value: "", unit: "" },
     { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "kbps" },
     { description: "bitrate outbound", value: Math.floor(clientStats.SendBitrate/1000), unit: "kbps" },
     { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "kbps" },
     { description: "nackRateOutboundMax", value: clientNetworkStats.nackRateOutboundMax, unit: "%" },
-    { description: "uplink", value: clientNetworkStats.uplink, unit: "" },
-
-    { description: "", value: "", unit: "" },
+    { description: "down stats", value: "", unit: "" },
     { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
     { description: "bitrate inbound", value: Math.floor(clientStats.RecvBitrate/1000), unit: "kbps" },
     { description: "lossCountAgoraAudioVideoInboundAvgMax", value: clientNetworkStats.lossCountAgoraAudioVideoInboundAvgMax, unit: "" },
+    { description: "", value: "", unit: "" },
+    { description: "uplink", value: clientNetworkStats.uplink, unit: "" },
     { description: "downlink", value: clientNetworkStats.downlink, unit: "" },
+    { description: "", value: "", unit: "" },
+    { description: "SDK uplink", value: displayAgoraQuality(_netlocal.uplinkNetworkQuality), unit: "" },
+    { description: "SDK downlink", value: displayAgoraQuality(_netlocal.downlinkNetworkQuality), unit: "" },
+
+    
   ]
   $("#client-stats").html(`
     ${clientNetworkStatsList.map(stat => `<p class="stats-row"><b>${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   `)
-  // get the local track stats message
-  //const localStats = { video: client.getLocalVideoStats(), audio: client.getLocalAudioStats() };
-  const localStatsList = [
+   const localStatsList = [
   ];
   $("#local-stats").html(`
     ${localStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   `);
 
   let _userStatsMap=AgoraRTCNetEx.getRemoteNetworkStats();
+  let ag=client.getRemoteNetworkQuality();
+console.log('ag.remote',client.getRemoteNetworkQuality());
+  //console.log(_userStatsMap);
 
   Object.keys(remoteUsers).forEach(uid => {
-    // get the remote track stats message
-    //const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
     const remoteTracksStatsList = [
-
       { description: "Uplink", value: _userStatsMap[uid].uplink, unit: "" },
       { description: "Downlink", value: _userStatsMap[uid].downlink, unit: "" },
+      { description: "SDK Uplink", value: displayAgoraQuality(ag[uid].uplinkNetworkQuality), unit: "" },
+      { description: "SDK Downlink", value: displayAgoraQuality(ag[uid].downlinkNetworkQuality), unit: "" },
     ];
     $(`#player-wrapper-${uid} .track-stats`).html(`
       ${remoteTracksStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}

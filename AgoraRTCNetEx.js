@@ -45,7 +45,7 @@ var AgoraRTCNetEx = (function () {
             lossCountAgoraAudioInboundAvg: 0,
             currentPacketLossRate: 0,
             outboundEstimatedBitrate: 0,
-            targetBitrate:0,
+            targetBitrate: 0,
             downlink: NetworkStatusExcellent,
             uplink: NetworkStatusExcellent,
         };
@@ -93,14 +93,8 @@ var AgoraRTCNetEx = (function () {
                         if (!_userStatsMap[uid]) {
                             _userStatsMap[uid] = {
                                 uid: uid,
-                                lastStatsRead: 0,
-                                lastNack: 0,
-                                nackRate: 0,
-                                lossRate: 0,
-                                packetChange: 0,
-                                lastPacketsLost: 0,
-                                downlink:NetworkStatusExcellent,
-                                uplink:NetworkStatusExcellent,
+                                downlink: NetworkStatusExcellent,
+                                uplink: NetworkStatusExcellent,
                             };
                         }
                         /*
@@ -134,19 +128,22 @@ var AgoraRTCNetEx = (function () {
                             })
                         }); */
                         const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
-                        if (_userStatsMap[uid].packetChange > 0) {
-                            _userStatsMap[uid].totalDuration = Number(remoteTracksStats.video.totalDuration).toFixed(0);
-                        } else {
-                            _userStatsMap[uid].totalDuration = -1;
-                        }
-                        if (_userStatsMap[uid].packetChange > 0 && _userStatsMap[uid].totalDuration > 1) // when people drop they remain for a while
-                        {
-                            clientStatsMapTemp.remoteSubCount = clientStatsMapTemp.remoteSubCount + 1;
-                        }
+                        // if (_userStatsMap[uid].packetChange > 0) {
+                        //     _userStatsMap[uid].totalDuration = Number(remoteTracksStats.video.totalDuration).toFixed(0);
+                        // } else {
+                        //     _userStatsMap[uid].totalDuration = -1;
+                        // }
+                        // if (_userStatsMap[uid].packetChange > 0 && _userStatsMap[uid].totalDuration > 1) // when people drop they remain for a while
+                        // {
+                        clientStatsMapTemp.remoteSubCount = clientStatsMapTemp.remoteSubCount + 1;
+                        // }
                         clientStatsMapTemp.lossCountAgoraVideoInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg + Math.floor(remoteTracksStats.video.receivePacketsLost);
                         clientStatsMapTemp.lossCountAgoraAudioInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg + Math.floor(remoteTracksStats.audio.receivePacketsLost);
                     }
                 }
+
+
+
                 if (clientStatsMapTemp.remoteSubCount > 0) {
                     clientStatsMapTemp.lossCountAgoraVideoInboundAvg = clientStatsMapTemp.lossCountAgoraVideoInboundAvg / clientStatsMapTemp.remoteSubCount;
                     clientStatsMapTemp.lossCountAgoraAudioInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg / clientStatsMapTemp.remoteSubCount;
@@ -191,12 +188,18 @@ var AgoraRTCNetEx = (function () {
                 }
                 clientStatsMapTemp.nackRateOutboundMax = nackRateOutboundMax;
             }
-        }        
-        clientStatsMapTemp.targetBitrate=_targetBitrate;
-        _clientStatsMap=clientStatsMapTemp;
+        }
+        clientStatsMapTemp.targetBitrate = _targetBitrate;
+        _clientStatsMap = clientStatsMapTemp;
         // fire local to app
-        AgoraRTCNetExEvents.emit("ClientVideoStatistics", _clientStatsMap);
-        // broadcast to others
+        // Create a Set to keep track of all valid uids
+        for (var uid in _userStatsMap) {
+            if (!client._users.some(user => user.uid == uid)) {
+                delete _userStatsMap[uid];
+            }
+          }
+        AgoraRTCNetExEvents.emit("NetworkUpdate", { "local": _clientStatsMap, "remote":_userStatsMap});
+        // broadcast to others in channel
         sendMessage(client, '{"uplink":"' + clientStatsMapTemp.uplink + '", "downlink":"' + clientStatsMapTemp.downlink + '"}');
     }
 
@@ -210,7 +213,7 @@ var AgoraRTCNetEx = (function () {
     function receiveMessage(senderId, data) {
         const textDecoder = new TextDecoder();
         const decodedText = textDecoder.decode(data);
-        console.log('receiveMessage', decodedText);
+        //console.log('receiveMessage', decodedText);
         const jsonObject = JSON.parse(decodedText);
         if (_userStatsMap[senderId]) {
             _userStatsMap[senderId].downlink = jsonObject.downlink;
