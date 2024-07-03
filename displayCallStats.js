@@ -251,6 +251,11 @@ console.log('ag.remote',client.getRemoteNetworkQuality());
     const remoteTracksStatsList = [
       { description: "Uplink", value: _userStatsMap[uid].uplink, unit: "" },
       { description: "Downlink", value: _userStatsMap[uid].downlink, unit: "" },
+      { description: "lastPacketsLost", value: _userStatsMap[uid].lastPacketsLost, unit: "" },
+      { description: "nackRate", value: _userStatsMap[uid].nackRate, unit: "" },
+      { description: "packetsLost", value: _userStatsMap[uid].packetsLost, unit: "" },
+      
+      { description: "", value: "", unit: "" },
       { description: "SDK Uplink", value: displayAgoraQuality(ag[uid].uplinkNetworkQuality), unit: "" },
       { description: "SDK Downlink", value: displayAgoraQuality(ag[uid].downlinkNetworkQuality), unit: "" },
     ];

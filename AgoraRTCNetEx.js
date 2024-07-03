@@ -97,10 +97,10 @@ var AgoraRTCNetEx = (function () {
                                 uplink: NetworkStatusExcellent,
                             };
                         }
-                        /*
+                        
                         await client._p2pChannel.connection.peerConnection.getStats(client._users[u].videoTrack._mediaStreamTrack).then(async stats => {
                             await stats.forEach(report => {
-                                if (report.type === "Dinbound-rtp" && report.kind === "video") {
+                                if (report.type === "inbound-rtp" && report.kind === "video") {
                                     var now = Date.now();
                                     var nack = report["nackCount"];
                                     var packetsReceived = report["packetsReceived"];
@@ -120,13 +120,14 @@ var AgoraRTCNetEx = (function () {
                                     _userStatsMap[uid].lastStatsRead = now;
                                     _userStatsMap[uid].lastNack = nack;
                                     _userStatsMap[uid].lastPacketsLost = packetsLost;
+                                    _userStatsMap[uid].packetsLost= report["packetsLost"];
                                     _userStatsMap[uid].nackRate = nackRate;
                                     _userStatsMap[uid].lossRate = lossRate;
                                     _userStatsMap[uid].lastPacketsRecvd = (packetsReceived + packetsLost);
                                     _userStatsMap[uid].packetChange = packetChange;
                                 }
                             })
-                        }); */
+                        }); 
                         const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
                         // if (_userStatsMap[uid].packetChange > 0) {
                         //     _userStatsMap[uid].totalDuration = Number(remoteTracksStats.video.totalDuration).toFixed(0);
@@ -137,7 +138,7 @@ var AgoraRTCNetEx = (function () {
                         // {
                         clientStatsMapTemp.remoteSubCount = clientStatsMapTemp.remoteSubCount + 1;
                         // }
-                        clientStatsMapTemp.lossCountAgoraVideoInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg + Math.floor(remoteTracksStats.video.receivePacketsLost);
+                        clientStatsMapTemp.lossCountAgoraVideoInboundAvg = clientStatsMapTemp.lossCountAgoraVideoInboundAvg + Math.floor(remoteTracksStats.video.receivePacketsLost);
                         clientStatsMapTemp.lossCountAgoraAudioInboundAvg = clientStatsMapTemp.lossCountAgoraAudioInboundAvg + Math.floor(remoteTracksStats.audio.receivePacketsLost);
                     }
                 }
@@ -157,7 +158,7 @@ var AgoraRTCNetEx = (function () {
                     lossCountAgoraAudioVideoInboundAvgMax = 0;
                 } else {
                     if (lossCountAgoraAudioVideoInboundAvgMax > 100) {
-                        // my uplink bad
+                        // my downlink bad
                         if (clientStats.RecvBitrate < 105000) {
                             clientStatsMapTemp.downlink = NetworkStatusCritical
                         } else if (clientStats.RecvBitrate < 0.3 * _targetBitrate * 1000) {
