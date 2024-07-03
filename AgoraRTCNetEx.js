@@ -189,7 +189,7 @@ var AgoraRTCNetEx = (function () {
                 if (clientStats.OutgoingAvailableBandwidth > 0.8 * _targetBitrate) {
                     nackRateOutboundMax = 0;
                 } else {
-                    if (nackRateOutboundMax > 10) {
+                    if (nackRateOutboundMax > 5) {
                         // my uplink bad
                         if (clientStats.OutgoingAvailableBandwidth < 105) {
                             clientStatsMapTemp.uplink = NetworkStatusCritical
