@@ -223,13 +223,14 @@ function flushStats() {
     { description: "down stats", value: "", unit: "" },
     { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
     { description: "bitrate inbound", value: Math.floor(clientStats.RecvBitrate/1000), unit: "kbps" },
-    { description: "lossCountAgoraAudioVideoInboundAvgMax", value: clientNetworkStats.lossCountAgoraAudioVideoInboundAvgMax, unit: "" },
+    { description: "lossAgAudioVideoInboundAvg", value: clientNetworkStats.lossAgAudioVideoInboundAvg, unit: "" },
+    { description: "lossAgAudioVideoInboundAvgAdjust", value: clientNetworkStats.lossAgAudioVideoInboundAvgAdjust, unit: "" },
     { description: "", value: "", unit: "" },
     { description: "uplink", value: clientNetworkStats.uplink, unit: "" },
     { description: "downlink", value: clientNetworkStats.downlink, unit: "" },
     { description: "", value: "", unit: "" },
-    { description: "SDK uplink", value: displayAgoraQuality(_netlocal.uplinkNetworkQuality), unit: "" },
-    { description: "SDK downlink", value: displayAgoraQuality(_netlocal.downlinkNetworkQuality), unit: "" },
+    { description: "SDK uplink", value: displayAgoraQuality(_netlocal?.uplinkNetworkQuality), unit: "" },
+    { description: "SDK downlink", value: displayAgoraQuality(_netlocal?.downlinkNetworkQuality), unit: "" },
 
     
   ]
@@ -251,8 +252,8 @@ console.log('ag.remote',client.getRemoteNetworkQuality());
     const remoteTracksStatsList = [
       { description: "Uplink", value: _userStatsMap[uid].uplink, unit: "" },
       { description: "Downlink", value: _userStatsMap[uid].downlink, unit: "" },
-      { description: "lastPacketsLost", value: _userStatsMap[uid].lastPacketsLost, unit: "" },
-      { description: "nackRate", value: _userStatsMap[uid].nackRate, unit: "" },
+      //{ description: "lastPacketsLost", value: _userStatsMap[uid].lastPacketsLost, unit: "" },
+      //{ description: "nackRate", value: _userStatsMap[uid].nackRate, unit: "" },
       { description: "packetsLost", value: _userStatsMap[uid].packetsLost, unit: "" },
       
       { description: "", value: "", unit: "" },
