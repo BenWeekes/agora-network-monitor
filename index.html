@@ -75,8 +75,12 @@
 
     </form>
 
-    <div id="client-stats" class="stats"></div>
-
+    <table width=800>
+      <tr>
+        <td><span id="client-stats" class="stats"></span></td>
+        <td><span id="client-stats2" class="stats"></span></td>
+      </tr>
+    </table>
     <div class="row video-group">
       <div class="col">
         <p id="local-player-name" class="player-name"></p>
@@ -95,7 +99,7 @@
 
   <script src="./assets/jquery-3.4.1.min.js"></script>
   <script src="./assets/bootstrap.bundle.min.js"></script>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/agora-rtm-sdk@1.5.1/index.js"></script>
   <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
   <script src="./AgoraRTCNetEx.js"></script>

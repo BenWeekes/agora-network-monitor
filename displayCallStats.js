@@ -172,6 +172,7 @@ function handleUserUnpublished(user, mediaType) {
 // start collect and show stats information
 function initStats() {
   statsInterval = setInterval(flushStats, 1000);
+  //flushStats();
 }
 
 // stop collect and show stats information
@@ -215,27 +216,32 @@ function flushStats() {
   const clientNetworkStats = AgoraRTCNetEx.getNetworkStats();
   
   const clientNetworkStatsList = [
-    { description: "up stats", value: "", unit: "" },
+    { description: "Uplink Stats", value: "", unit: "" },
     { description: "targetBitrate", value: clientNetworkStats.targetBitrate, unit: "kbps" },
     { description: "bitrate outbound", value: Math.floor(clientStats.SendBitrate/1000), unit: "kbps" },
     { description: "outboundEstimatedBitrate", value: clientNetworkStats.outboundEstimatedBitrate, unit: "kbps" },
     { description: "nackRateOutboundMax", value: clientNetworkStats.nackRateOutboundMax, unit: "%" },
-    { description: "down stats", value: "", unit: "" },
+    { description: "", value: "", unit: "" },
+    { description: "Nex uplink", value: clientNetworkStats.uplink, unit: "" },
+    { description: "SDK uplink", value: displayAgoraQuality(_netlocal?.uplinkNetworkQuality), unit: "" },
+  ]
+
+  const clientNetworkStatsList2 = [
+    { description: "Downlink Stats", value: "", unit: "" },
     { description: "remote user count", value: clientNetworkStats.remoteSubCount, unit: "" },
     { description: "bitrate inbound", value: Math.floor(clientStats.RecvBitrate/1000), unit: "kbps" },
     { description: "lossAgAudioVideoInboundAvg", value: clientNetworkStats.lossAgAudioVideoInboundAvg, unit: "" },
     { description: "lossAgAudioVideoInboundAvgAdjust", value: clientNetworkStats.lossAgAudioVideoInboundAvgAdjust, unit: "" },
     { description: "", value: "", unit: "" },
-    { description: "uplink", value: clientNetworkStats.uplink, unit: "" },
-    { description: "downlink", value: clientNetworkStats.downlink, unit: "" },
-    { description: "", value: "", unit: "" },
-    { description: "SDK uplink", value: displayAgoraQuality(_netlocal?.uplinkNetworkQuality), unit: "" },
+    { description: "Nex downlink", value: clientNetworkStats.downlink, unit: "" },
     { description: "SDK downlink", value: displayAgoraQuality(_netlocal?.downlinkNetworkQuality), unit: "" },
-
-    
   ]
   $("#client-stats").html(`
-    ${clientNetworkStatsList.map(stat => `<p class="stats-row"><b>${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
+    ${clientNetworkStatsList.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
+  `)
+
+  $("#client-stats2").html(`
+    ${clientNetworkStatsList2.map(stat => `<p class="stats-row">${stat.description}: ${stat.value} ${stat.unit}</p>`).join("")}
   `)
    const localStatsList = [
   ];
@@ -250,11 +256,11 @@ console.log('ag.remote',client.getRemoteNetworkQuality());
 
   Object.keys(remoteUsers).forEach(uid => {
     const remoteTracksStatsList = [
-      { description: "Uplink", value: _userStatsMap[uid].uplink, unit: "" },
-      { description: "Downlink", value: _userStatsMap[uid].downlink, unit: "" },
+      { description: "Nex Uplink", value: _userStatsMap[uid].uplink, unit: "" },
+      { description: "Nex Downlink", value: _userStatsMap[uid].downlink, unit: "" },
       //{ description: "lastPacketsLost", value: _userStatsMap[uid].lastPacketsLost, unit: "" },
       //{ description: "nackRate", value: _userStatsMap[uid].nackRate, unit: "" },
-      { description: "packetsLost", value: _userStatsMap[uid].packetsLost, unit: "" },
+    //  { description: "packetsLost", value: _userStatsMap[uid].packetsLost, unit: "" },
       
       { description: "", value: "", unit: "" },
       { description: "SDK Uplink", value: displayAgoraQuality(ag[uid].uplinkNetworkQuality), unit: "" },

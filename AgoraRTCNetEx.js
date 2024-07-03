@@ -42,8 +42,6 @@ var AgoraRTCNetEx = (function () {
             remoteSubCount: 0,
             lossAgAudioVideoInboundSum: 0,
             lossAgAudioVideoInboundAvg: 0,
-           // lossWebRTCAudioVideoInboundSum: 0,
-          //  lossWebRTCAudioVideoInboundAvg: 0,
             outboundEstimatedBitrate: 0,
             targetBitrate: 0,
             lossAgAudioVideoInboundAvgAdjust: 0,
@@ -84,7 +82,6 @@ var AgoraRTCNetEx = (function () {
                 });
 
                 clientStatsMapTemp.outboundEstimatedBitrate = Math.floor(clientStats.OutgoingAvailableBandwidth);
-               // clientStatsMapTemp.currentPacketLossRate = outboundStats.currentPacketLossRate;
 
                 // inbounds (downlinks)
                 for (var u = 0; u < client._users.length; u++) {
@@ -99,60 +96,6 @@ var AgoraRTCNetEx = (function () {
                                 uplink: NetworkStatusExcellent,
                             };
                         }
-
-                        /*
-                        await client._p2pChannel.connection.peerConnection.getStats(client._users[u].videoTrack._mediaStreamTrack).then(async stats => {
-                            await stats.forEach(report => {
-                           //     console.log('report',report.type,report.kind);
-
-                                if (report.type === "inbound-rtp" && report.kind === "video") {
-                                    if (!isNaN(report["packetsLost"])) {
-                                        _userStatsMap[uid].packetsLost+=report["packetsLost"];
-                                        clientStatsMapTemp.lossWebRTCAudioVideoInboundSum+=report["packetsLost"];
-                                    }
-
-                                    /*
-                                    var now = Date.now();
-                                    var nack = report["nackCount"];
-                                    var packetsReceived = report["packetsReceived"];
-                                    var packetsLost = report["packetsLost"];
-                                    var nackChange = (nack - _userStatsMap[uid].lastNack);
-                                    var plChange = (packetsLost - _userStatsMap[uid].lastPacketsLost);
-                                    var packetChange = ((packetsReceived + packetsLost) - _userStatsMap[uid].lastPacketsRecvd);
-                                    var timeDiff = now - _userStatsMap[uid].lastStatsRead;
-                                    var nackRate = 0;
-                                    var lossRate = 0;
-                                    if (packetChange > 0 && nackChange > 0) {
-                                        nackRate = Math.floor((nackChange / packetChange) * (timeDiff / 10));
-                                    }
-                                    if (packetChange > 0 && plChange > 0) {
-                                        lossRate = Math.floor((plChange / packetChange) * (timeDiff / 10));
-                                    }
-                                    _userStatsMap[uid].lastStatsRead = now;
-                                    _userStatsMap[uid].lastNack = nack;
-                                    _userStatsMap[uid].lastPacketsLost = packetsLost;
-                                    _userStatsMap[uid].packetsLost= report["packetsLost"];
-                                    _userStatsMap[uid].nackRate = nackRate;
-                                    _userStatsMap[uid].lossRate = lossRate;
-                                    _userStatsMap[uid].lastPacketsRecvd = (packetsReceived + packetsLost);
-                                    _userStatsMap[uid].packetChange = packetChange;
-                                 
-                                }
-                            })
-                        }); 
-                        await client._p2pChannel.connection.peerConnection.getStats(client._users[u].audioTrack._mediaStreamTrack).then(async stats => {
-                            await stats.forEach(report => {
-                               // console.log('report',report.type,report.kind);
-                                if (report.type === "inbound-rtp" && report.kind === "audio") {
-                                    if (!isNaN(report["packetsLost"])) {
-                                        clientStatsMapTemp.lossWebRTCAudioVideoInboundSum+=report["packetsLost"];
-                                        _userStatsMap[uid].packetsLost+=report["packetsLost"];
-                                    }
-
-                                }
-                            })
-                        }); 
-                           */
                         const remoteTracksStats = { video: client.getRemoteVideoStats()[uid], audio: client.getRemoteAudioStats()[uid] };
                         _userStatsMap[uid].packetsLost=( Math.floor(remoteTracksStats.video.receivePacketsLost)+ Math.floor(remoteTracksStats.audio.receivePacketsLost))
                         clientStatsMapTemp.remoteSubCount = clientStatsMapTemp.remoteSubCount + 1;
@@ -160,8 +103,7 @@ var AgoraRTCNetEx = (function () {
                     }
                 }
 
-                if (clientStatsMapTemp.remoteSubCount > 0) {
-                    //clientStatsMapTemp.lossWebRTCAudioVideoInboundAvg = clientStatsMapTemp.lossWebRTCAudioVideoInboundSum / clientStatsMapTemp.remoteSubCount;
+                if (clientStatsMapTemp.remoteSubCount > 0) {                
                     clientStatsMapTemp.lossAgAudioVideoInboundAvg = clientStatsMapTemp.lossAgAudioVideoInboundSum / clientStatsMapTemp.remoteSubCount;
                 }
 
