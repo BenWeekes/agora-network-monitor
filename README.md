@@ -1,9 +1,9 @@
 
 ## AgoraRTCNetEx.js
-This javascript module provides an 'Out of band' network monitor to work along side AgoraRTC 4.x SDK.    
+This javascript module provides an accurate network monitor to work along side AgoraRTC 4.x SDK.    
 It is able to report the true uplink/downlink status of each host in the channel.       
-It does not revert to 'Good' if the packet losses reduce while the bitrate is lowered in either Full Path Feedback or Dual Stream failover modes.      
-It does not confuse my downlink with your uplink quality or vice versa.         
+It does not revert to 'Excellent' if the packet loss reduces when the bitrate is lowered in either Full Path Feedback or Dual Stream failover modes.      
+It does not confuse Host A downlink with Host B uplink quality or vice versa.         
 
 
 #### Include the javascript:
@@ -15,31 +15,29 @@ It does not confuse my downlink with your uplink quality or vice versa.
 Before publishing your video to the channel, call the optimizeNetworkControl() method.         
 Pass in the min and max bit rates that you wish the high stream encoder to move between and which match those of your selected profile.     
   
-## Function arguments      
+## Initlialize       
 
 <pre>
-
 AgoraRTCNetEx.monitorNetwork(client, targetBitrate);
 
 client         The AgoraRTC client object returned from createClient method.     
 targetBitrate  The target/max bitrate a client will publish video at. 
 </pre>
 
+#### Usage
+You can either call the methods 
+<pre>
+AgoraRTCNetEx.getNetworkStats();      
+AgoraRTCNetEx.getRemoteNetworkStats();
+</pre>
+Or subscribe to events     
+<pre>
+           AgoraRTCNetExEvents.on("NetworkUpdate",networkUpdate);
+</pre>
 
 #### Web Demo
 https://sa-utils.agora.io/agora-network-monitor/index.html
 
 #### Demo Videos
 
-Mac - Mac
-https://drive.google.com/file/d/1KQ2kqxnAGQdyVxYBc7jX5khIwyF7vMqw/view?usp=sharing
-
-
-Mac - iOS 
-https://drive.google.com/file/d/10TJpSpex5E_baM26rqxnb1d9alIyA7lS/view?usp=sharing
-
-
-#### Further enhancements   
-Test further when more than 2 hosts publishing in channel.      
-Switch subscriber to low stream if inbound bitrate below br_min.    
 
