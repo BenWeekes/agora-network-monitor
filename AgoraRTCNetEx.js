@@ -70,7 +70,7 @@ var AgoraRTCNetEx = (function () {
                             var packetChange = (packetsSent - lastPacketsSent);
                             var timeDiff = now - lastStatsRead;
                             let nackRateOutbound = 0;
-                            if (packetChange > 0 && nackChange > 0) {
+                            if (packetChange > 0 && nackChange > 0 && lastStatsRead >0) {
                                 nackRateOutbound = Math.floor((nackChange / packetChange) * (timeDiff / 10));
                                 if (nackRateOutbound > nackRateOutboundMax) {
                                     nackRateOutboundMax = nackRateOutbound;
