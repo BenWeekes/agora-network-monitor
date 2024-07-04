@@ -156,7 +156,7 @@ var AgoraRTCNetEx = (function () {
                 delete _userStatsMap[uid];
             }
           }
-        AgoraRTCNetExEvents.emit("NetworkUpdate", { "local": _clientStatsMap, "remote":_userStatsMap});
+        AgoraRTCNetExEvents.emit("network-quality", { "local": _clientStatsMap, "remote":_userStatsMap});
         // broadcast to others in channel
         sendMessage(client, '{"uplink":"' + clientStatsMapTemp.uplink + '", "downlink":"' + clientStatsMapTemp.downlink + '"}');
     }

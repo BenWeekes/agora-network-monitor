@@ -80,7 +80,7 @@ async function join() {
   client.on("user-published", handleUserPublished);
   client.on("user-unpublished", handleUserUnpublished);
 
-  AgoraRTCNetExEvents.on("NetworkUpdate",networkUpdate);
+  AgoraRTCNetExEvents.on("network-quality",networkUpdate);
   client.on("network-quality",networkUpdateA);
   client.getRemoteNetworkQuality();
 
@@ -257,7 +257,7 @@ console.log('ag.remote',client.getRemoteNetworkQuality());
   Object.keys(remoteUsers).forEach(uid => {
     const remoteTracksStatsList = [
       { description: "Nex Uplink", value: _userStatsMap[uid].uplink, unit: "" },
-      { description: "Nex Downlink", value: _userStatsMap[uid].downlink, unit: "" },
+      { description: "Nex   Downlink", value: _userStatsMap[uid].downlink, unit: "" },
       //{ description: "lastPacketsLost", value: _userStatsMap[uid].lastPacketsLost, unit: "" },
       //{ description: "nackRate", value: _userStatsMap[uid].nackRate, unit: "" },
     //  { description: "packetsLost", value: _userStatsMap[uid].packetsLost, unit: "" },
