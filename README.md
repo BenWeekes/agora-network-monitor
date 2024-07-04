@@ -32,7 +32,7 @@ AgoraRTCNetEx.getRemoteNetworkStats();
 </pre>
 Or subscribe to events     
 <pre>
-           AgoraRTCNetExEvents.on("NetworkUpdate",networkUpdate);
+AgoraRTCNetExEvents.on("NetworkUpdate",networkUpdate);
 </pre>
 
 #### Web Demo
