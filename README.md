@@ -8,7 +8,7 @@ It does not confuse Host A downlink with Host B uplink quality or vice versa.
 
 #### Include the javascript:
 
-         <script src="./AgoraRTCNetEx.js"></script>
+<script src="./AgoraRTCNetEx.js"></script>
                 
 #### Call the method 
 
